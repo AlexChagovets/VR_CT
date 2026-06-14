@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <title>VR_CT AR Marker</title>
 
+    <!-- A-Frame: створення 3D-сцени -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+
+    <!-- AR.js: розпізнавання маркера через камеру -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 
     <style>
@@ -37,11 +40,18 @@
     renderer="logarithmicDepthBuffer: true;"
     arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;"
 >
+    <!-- 
+        ВАЖЛИВО:
+        pattern-marker.patt має бути в папці markers
+        і має відповідати саме тій картинці pattern-marker.png,
+        яку ти показуєш камері.
+    -->
     <a-marker
         id="marker"
         type="pattern"
-        url="markers/pattern-marker.patt"
+        url="./markers/pattern-marker.patt"
     >
+        <!-- Тестовий великий червоний куб -->
         <a-box
             position="0 0.5 0"
             rotation="0 45 0"
@@ -51,12 +61,14 @@
             color="red">
         </a-box>
 
+        <!-- Зелена сфера зверху, щоб об'єкт було добре видно -->
         <a-sphere
             position="0 1.25 0"
             radius="0.25"
             color="lime">
         </a-sphere>
 
+        <!-- Підпис -->
         <a-text
             value="VR_CT"
             position="-0.7 1.7 0"
@@ -66,6 +78,7 @@
         </a-text>
     </a-marker>
 
+    <!-- Камера AR-сцени -->
     <a-entity camera></a-entity>
 </a-scene>
 
@@ -75,12 +88,12 @@
 
     marker.addEventListener("markerFound", function () {
         statusText.textContent = "Маркер знайдено";
-        statusText.style.background = "rgba(0, 150, 0, 0.8)";
+        statusText.style.background = "rgba(0, 150, 0, 0.85)";
     });
 
     marker.addEventListener("markerLost", function () {
         statusText.textContent = "Маркер втрачено";
-        statusText.style.background = "rgba(150, 0, 0, 0.8)";
+        statusText.style.background = "rgba(150, 0, 0, 0.85)";
     });
 </script>
 
