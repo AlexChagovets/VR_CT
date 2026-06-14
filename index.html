@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>VR_CT AR Marker</title>
+    <title>VR_CT AR Surface</title>
 
     <!-- A-Frame: створення 3D-сцени -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
@@ -34,49 +34,134 @@
 
 <div id="status">Очікування маркера...</div>
 
+<script>
+    AFRAME.registerComponent("pa1-surface", {
+        init: function () {
+            const widthSegments = 40;
+            const depthSegments = 40;
+
+            const size = 2.2;
+
+            const vertices = [];
+            const colors = [];
+            const indices = [];
+
+            for (let i = 0; i <= widthSegments; i++) {
+                for (let j = 0; j <= depthSegments; j++) {
+                    const x = (i / widthSegments - 0.5) * size;
+                    const z = (j / depthSegments - 0.5) * size;
+
+                    // Поверхня, аналогічна ідеї з PA1:
+                    // висота залежить від координат x та z
+                    const y = 0.25 * Math.sin(3 * x) * Math.cos(3 * z) + 0.45;
+
+                    vertices.push(x, y, z);
+
+                    // Колір залежить від висоти поверхні
+                    const normalizedHeight = (y - 0.2) / 0.6;
+
+                    colors.push(
+                        0.2 + normalizedHeight * 0.8,
+                        0.4,
+                        1.0 - normalizedHeight * 0.6
+                    );
+                }
+            }
+
+            for (let i = 0; i < widthSegments; i++) {
+                for (let j = 0; j < depthSegments; j++) {
+                    const a = i * (depthSegments + 1) + j;
+                    const b = (i + 1) * (depthSegments + 1) + j;
+                    const c = (i + 1) * (depthSegments + 1) + (j + 1);
+                    const d = i * (depthSegments + 1) + (j + 1);
+
+                    indices.push(a, b, d);
+                    indices.push(b, c, d);
+                }
+            }
+
+            const geometry = new THREE.BufferGeometry();
+
+            geometry.setAttribute(
+                "position",
+                new THREE.Float32BufferAttribute(vertices, 3)
+            );
+
+            geometry.setAttribute(
+                "color",
+                new THREE.Float32BufferAttribute(colors, 3)
+            );
+
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            const material = new THREE.MeshStandardMaterial({
+                vertexColors: true,
+                side: THREE.DoubleSide,
+                roughness: 0.45,
+                metalness: 0.05
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            this.el.setObject3D("mesh", mesh);
+        }
+    });
+</script>
+
 <a-scene
     embedded
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true;"
     arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;"
 >
-    <!-- 
-        ВАЖЛИВО:
-        pattern-marker.patt має бути в папці markers
-        і має відповідати саме тій картинці pattern-marker.png,
-        яку ти показуєш камері.
-    -->
+    <!-- Маркер, згенерований у AR.js Marker Training -->
     <a-marker
         id="marker"
         type="pattern"
         url="./markers/pattern-marker.patt"
     >
-        <!-- Тестовий великий червоний куб -->
-        <a-box
-            position="0 0.5 0"
-            rotation="0 45 0"
-            width="1"
-            height="1"
-            depth="1"
-            color="red">
-        </a-box>
 
-        <!-- Зелена сфера зверху, щоб об'єкт було добре видно -->
-        <a-sphere
-            position="0 1.25 0"
-            radius="0.25"
-            color="lime">
-        </a-sphere>
+        <!-- Поверхня з PA1, перенесена в AR-сцену -->
+        <a-entity
+            pa1-surface
+            position="0 0 0"
+            rotation="0 0 0"
+            scale="0.8 0.8 0.8">
+        </a-entity>
+
+        <!-- Каркасна площина маркера для візуальної прив'язки -->
+        <a-plane
+            position="0 0.01 0"
+            rotation="-90 0 0"
+            width="2.4"
+            height="2.4"
+            color="#111111"
+            opacity="0.25"
+            transparent="true">
+        </a-plane>
 
         <!-- Підпис -->
         <a-text
-            value="VR_CT"
-            position="-0.7 1.7 0"
+            value="PA1 Surface"
+            position="-0.85 1.15 -1.1"
             rotation="-90 0 0"
-            color="blue"
+            color="yellow"
             width="3">
         </a-text>
+
+        <a-text
+            value="VR_CT"
+            position="-0.45 0.08 1.05"
+            rotation="-90 0 0"
+            color="white"
+            width="2.5">
+        </a-text>
+
     </a-marker>
+
+    <!-- Освітлення -->
+    <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+    <a-entity light="type: directional; intensity: 0.9" position="1 2 1"></a-entity>
 
     <!-- Камера AR-сцени -->
     <a-entity camera></a-entity>
