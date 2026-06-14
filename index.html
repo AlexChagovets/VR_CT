@@ -2,13 +2,16 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>VR_CT AR Surface</title>
+    <title>VR_CT AR Surface from PA1</title>
 
     <!-- A-Frame: створення 3D-сцени -->
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
 
     <!-- AR.js: розпізнавання маркера через камеру -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+
+    <!-- Модель / поверхня з PA1 -->
+    <script src="./Model.js"></script>
 
     <style>
         body {
@@ -35,74 +38,48 @@
 <div id="status">Очікування маркера...</div>
 
 <script>
+    /*
+        Компонент A-Frame для відображення поверхні з PA1.
+        Дані поверхні беруться з функції CreateSurfaceData(data),
+        яка знаходиться у файлі Model.js.
+    */
     AFRAME.registerComponent("pa1-surface", {
         init: function () {
-            const widthSegments = 40;
-            const depthSegments = 40;
+            const data = {};
 
-            const size = 2.2;
-
-            const vertices = [];
-            const colors = [];
-            const indices = [];
-
-            for (let i = 0; i <= widthSegments; i++) {
-                for (let j = 0; j <= depthSegments; j++) {
-                    const x = (i / widthSegments - 0.5) * size;
-                    const z = (j / depthSegments - 0.5) * size;
-
-                    // Поверхня, аналогічна ідеї з PA1:
-                    // висота залежить від координат x та z
-                    const y = 0.25 * Math.sin(3 * x) * Math.cos(3 * z) + 0.45;
-
-                    vertices.push(x, y, z);
-
-                    // Колір залежить від висоти поверхні
-                    const normalizedHeight = (y - 0.2) / 0.6;
-
-                    colors.push(
-                        0.2 + normalizedHeight * 0.8,
-                        0.4,
-                        1.0 - normalizedHeight * 0.6
-                    );
-                }
+            if (typeof CreateSurfaceData !== "function") {
+                console.error("CreateSurfaceData не знайдено. Перевір, чи підключений Model.js.");
+                return;
             }
 
-            for (let i = 0; i < widthSegments; i++) {
-                for (let j = 0; j < depthSegments; j++) {
-                    const a = i * (depthSegments + 1) + j;
-                    const b = (i + 1) * (depthSegments + 1) + j;
-                    const c = (i + 1) * (depthSegments + 1) + (j + 1);
-                    const d = i * (depthSegments + 1) + (j + 1);
-
-                    indices.push(a, b, d);
-                    indices.push(b, c, d);
-                }
-            }
+            CreateSurfaceData(data);
 
             const geometry = new THREE.BufferGeometry();
 
             geometry.setAttribute(
                 "position",
-                new THREE.Float32BufferAttribute(vertices, 3)
+                new THREE.BufferAttribute(data.verticesF32, 3)
             );
 
-            geometry.setAttribute(
-                "color",
-                new THREE.Float32BufferAttribute(colors, 3)
+            geometry.setIndex(
+                new THREE.BufferAttribute(data.indicesU16, 1)
             );
 
-            geometry.setIndex(indices);
             geometry.computeVertexNormals();
 
             const material = new THREE.MeshStandardMaterial({
-                vertexColors: true,
+                color: "#dddddd",
                 side: THREE.DoubleSide,
-                roughness: 0.45,
+                roughness: 0.5,
                 metalness: 0.05
             });
 
             const mesh = new THREE.Mesh(geometry, material);
+
+            /*
+                Масштаб і поворот підібрані для AR-маркера.
+                Якщо поверхня буде завелика або мала — міняємо scale нижче в a-entity.
+            */
             this.el.setObject3D("mesh", mesh);
         }
     });
@@ -121,15 +98,15 @@
         url="./markers/pattern-marker.patt"
     >
 
-        <!-- Поверхня з PA1, перенесена в AR-сцену -->
+        <!-- Поверхня з PA1 -->
         <a-entity
             pa1-surface
-            position="0 0 0"
-            rotation="0 0 0"
-            scale="0.8 0.8 0.8">
+            position="0 0.15 0"
+            rotation="-90 0 0"
+            scale="0.08 0.08 0.08">
         </a-entity>
 
-        <!-- Каркасна площина маркера для візуальної прив'язки -->
+        <!-- Основа на маркері, щоб було видно площину прив'язки -->
         <a-plane
             position="0 0.01 0"
             rotation="-90 0 0"
@@ -143,7 +120,7 @@
         <!-- Підпис -->
         <a-text
             value="PA1 Surface"
-            position="-0.85 1.15 -1.1"
+            position="-0.95 1.2 -1.1"
             rotation="-90 0 0"
             color="yellow"
             width="3">
