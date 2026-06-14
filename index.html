@@ -2,10 +2,10 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>VR_CT AR Marker Test</title>
+    <title>VR_CT AR Marker</title>
 
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
 
     <style>
         body {
@@ -35,10 +35,13 @@
     embedded
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true;"
-    arjs="sourceType: webcam; debugUIEnabled: false;"
+    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;"
 >
-    <a-marker id="marker" preset="hiro">
-        <!-- Великий червоний куб для тесту -->
+    <a-marker
+        id="marker"
+        type="pattern"
+        url="markers/pattern-marker.patt"
+    >
         <a-box
             position="0 0.5 0"
             rotation="0 45 0"
@@ -48,17 +51,15 @@
             color="red">
         </a-box>
 
-        <!-- Зелена сфера над кубом, щоб об'єкт точно було видно -->
         <a-sphere
             position="0 1.25 0"
             radius="0.25"
             color="lime">
         </a-sphere>
 
-        <!-- Підпис -->
         <a-text
             value="VR_CT"
-            position="-0.6 1.7 0"
+            position="-0.7 1.7 0"
             rotation="-90 0 0"
             color="blue"
             width="3">
