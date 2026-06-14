@@ -2,12 +2,12 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>VR CT - AR.js Marker</title>
+    <title>VR_CT AR.js Marker</title>
 
-    <!-- A-Frame бібліотека для створення 3D-сцени -->
+    <!-- A-Frame: бібліотека для створення 3D-сцени -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 
-    <!-- AR.js бібліотека для роботи з камерою та marker tracking -->
+    <!-- AR.js: бібліотека для роботи з камерою та marker tracking -->
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
 
     <style>
@@ -15,49 +15,54 @@
             margin: 0;
             overflow: hidden;
         }
+
+        .info {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 9999;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
 
+<div class="info">
+    VR_CT AR marker demo
+</div>
+
 <a-scene
     embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true;"
     arjs="sourceType: webcam; debugUIEnabled: false;"
 >
-    <!-- Стандартний AR.js marker -->
+    <!-- 
+        Стандартний AR.js marker.
+        Файл pattern-marker.patt має лежати у папці markers.
+    -->
     <a-marker type="pattern" url="./markers/pattern-marker.patt">
 
-        <!-- Основний 3D-об'єкт -->
+        <!-- Великий тестовий куб.
+             Якщо marker розпізнається, цей куб має з'явитися поверх нього. -->
         <a-box
             position="0 0.5 0"
             rotation="0 45 0"
-            width="0.9"
-            height="0.9"
-            depth="0.9"
-            color="#dddddd">
+            width="1"
+            height="1"
+            depth="1"
+            color="red">
         </a-box>
 
-        <!-- Червона вертикальна лінія, як візуальний акцент з PA1 -->
-        <a-cylinder
-            position="-0.15 0.55 0.5"
-            rotation="0 0 0"
-            radius="0.035"
-            height="0.9"
-            color="red">
-        </a-cylinder>
-
-        <!-- Бірюзова вертикальна лінія, як другий візуальний акцент -->
-        <a-cylinder
-            position="0.15 0.55 0.5"
-            rotation="0 0 0"
-            radius="0.035"
-            height="0.9"
-            color="cyan">
-        </a-cylinder>
-
-        <!-- Підпис роботи -->
+        <!-- Підпис над кубом -->
         <a-text
             value="VR_CT"
-            position="-0.65 1.15 0"
+            position="-0.55 1.25 0"
             rotation="-90 0 0"
             color="blue"
             width="3">
